@@ -3,16 +3,15 @@ package com.example.demo.model;
 import java.io.Serializable;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
@@ -26,12 +25,13 @@ public class Booking implements Serializable {
     @GeneratedValue(generator = "uuid2")
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
     private UUID id;
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @Fetch(FetchMode.JOIN)
-    @JoinColumn(name = "seminarId", nullable = false)
+    
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinColumn(name = "seminar_id", referencedColumnName = "id")
     private SeminarVO currentSeminar;
 
+    
+    
     // KONSTRUKTOREN:
 
     public Booking(SeminarVO currentSeminar) {
@@ -43,6 +43,8 @@ public class Booking implements Serializable {
         this(null);
     }
 
+    
+    
     // Setter/Getter:
 
     public UUID getId() {

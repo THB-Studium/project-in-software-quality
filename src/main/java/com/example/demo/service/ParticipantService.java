@@ -14,7 +14,11 @@ import com.example.demo.model.ParticipantVO;
 import com.example.demo.repository.ParticipantVORepository;
 import com.example.demo.service.exception.ResourceNotFoundException;
 
-
+/**
+ * 
+ * @author Steve Ngalamo
+ * @version 1.0 30.08.2020
+ */
 @Transactional(rollbackOn = Exception.class)
 @Service
 public class ParticipantService {
@@ -22,6 +26,8 @@ public class ParticipantService {
     @Autowired
     private ParticipantVORepository participantVORepository;
 
+    
+    
     /**
      * TO GET ALL PARTICIPANTS
      * 
@@ -43,7 +49,8 @@ public class ParticipantService {
             return participantOp.get();
         } else {
             throw new ResourceNotFoundException(
-                    String.format("A participant with the id %s does not exist", participantId.toString()));
+                    String.format("A participant with the id %s does not exist", participantId.toString())
+                    );
         }
     }
 
@@ -63,12 +70,11 @@ public class ParticipantService {
      * 
      * @param participantId
      * @param newParticipantVO
-     * @return
      */
-    public ParticipantVO update(UUID participantId, ParticipantVO newParticipantVO) {
-        ParticipantVO participantFound = getOne(participantId);
-        newParticipantVO.setId(participantFound.getId());
-        return participantVORepository.save(newParticipantVO);
+    public void update(UUID participantId, ParticipantVO update) {
+        getOne(participantId);
+        update.setId(participantId);
+        participantVORepository.save(update);
     }
 
     /**

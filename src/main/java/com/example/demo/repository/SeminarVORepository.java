@@ -1,5 +1,6 @@
 package com.example.demo.repository;
 
+import java.util.Set;
 import java.util.UUID;
 
 import javax.inject.Named;
@@ -12,5 +13,7 @@ import com.example.demo.model.SeminarVO;
 @Named
 public interface SeminarVORepository
 	extends JpaRepository<SeminarVO, UUID>, JpaSpecificationExecutor<SeminarVO> {
+    
+    public Set<SeminarVO> findAllByParticipantsId(UUID participantId);
 	
 }

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -15,7 +16,6 @@ import javax.persistence.Table;
 import org.hibernate.annotations.GenericGenerator;
 
 import com.example.demo.constant.StateOfSeminarVO;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "seminar")
@@ -31,14 +31,12 @@ public class SeminarVO implements Serializable {
     private String name;
     private int max;
     private StateOfSeminarVO state;
-
-    @OneToMany(mappedBy = "currentSeminar", fetch = FetchType.EAGER)
-    @JsonIgnore
-    private Set<Booking> booking;
-    @OneToMany(mappedBy = "currentSeminar", fetch = FetchType.EAGER)
-    @JsonIgnore
+    
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<ParticipantVO> participants;
 
+    
+    
     // KONSTRUKTOREN:
 
     public SeminarVO(String name, StateOfSeminarVO state, int max) {
@@ -46,19 +44,20 @@ public class SeminarVO implements Serializable {
         setName(name);
         setMax(max);
         setState(state);
-
-        setBooking(new HashSet<>());
+       
         setParticipants(new HashSet<>());
     }
 
-    public SeminarVO(String name) {
-        this(name, StateOfSeminarVO.NOTAVAILABLE, 0);
+    public SeminarVO(String name, int max) {
+        this(name, StateOfSeminarVO.AVAILABLE, max);
     }
 
     public SeminarVO() {
-        this(null);
+        this(null, 0);
     }
 
+    
+    
     // Setter und Getter
 
     public UUID getId() {
@@ -91,14 +90,6 @@ public class SeminarVO implements Serializable {
 
     public void setState(StateOfSeminarVO state) {
         this.state = state;
-    }
-
-    public void setBooking(Set<Booking> booking) {
-        this.booking = booking;
-    }
-
-    public Set<Booking> getBooking() {
-        return booking;
     }
 
     public Set<ParticipantVO> getParticipants() {

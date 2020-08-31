@@ -6,17 +6,18 @@ import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
+/**
+ * 
+ * @author Steve Ngalamo
+ * @version 1.0 30.08.2020
+ */
 @Entity
 @Table(name = "participant")
-public class ParticipantVO implements Serializable {
+public class ParticipantVO implements Serializable, Comparable<ParticipantVO> {
 
     // ATTRIBUTEN:
     private static final long serialVersionUID = -4441736385404344904L;
@@ -27,54 +28,20 @@ public class ParticipantVO implements Serializable {
     private UUID id;
     private String name;
 
-    @ManyToOne
-    @Fetch(FetchMode.JOIN)
-    @JoinColumn(name = "seminar_id", nullable = false)
-    private SeminarVO currentSeminar;
-
+    
+    
     // KONSTRUKTOREN:
 
-    public ParticipantVO(String name, SeminarVO currentSeminar) {
+    public ParticipantVO(String name) {
         super();
         setName(name);
-        setCurrentSeminar(currentSeminar);
     }
 
     public ParticipantVO() {
-        this(null, null);
+        this(null);
     }
-
-    // EXTRA METHODEN:
-
-    public String toString() {
-        return name;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        ParticipantVO other = (ParticipantVO) obj;
-        if (name == null) {
-            if (other.name != null)
-                return false;
-        } else if (!name.equals(other.name))
-            return false;
-        return true;
-    }
-
+    
+    
     // Setter und Getter:
 
     public UUID getId() {
@@ -92,13 +59,13 @@ public class ParticipantVO implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
+    
+    
+    // EXTRA METHODE:
 
-    public SeminarVO getCurrentSeminar() {
-        return currentSeminar;
-    }
-
-    public void setCurrentSeminar(SeminarVO currentSeminar) {
-        this.currentSeminar = currentSeminar;
+    @Override
+    public int compareTo(ParticipantVO participant) {
+        return getName().compareTo(participant.getName());
     }
 
 }

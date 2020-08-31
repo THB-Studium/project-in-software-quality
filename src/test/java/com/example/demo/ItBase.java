@@ -18,8 +18,10 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.example.demo.constant.StateOfSeminarVO;
+import com.example.demo.model.Booking;
 import com.example.demo.model.ParticipantVO;
 import com.example.demo.model.SeminarVO;
+import com.example.demo.repository.BookingRepository;
 import com.example.demo.repository.ParticipantVORepository;
 import com.example.demo.repository.SeminarVORepository;
 
@@ -46,9 +48,11 @@ public class ItBase {
     protected PlatformTransactionManager transactionManager;
 
     @Autowired
-    protected ParticipantVORepository participantVORepository;
+    protected BookingRepository bookingRepository;
     @Autowired
     protected SeminarVORepository seminarVORepository;
+    @Autowired
+    protected ParticipantVORepository participantVORepository;
 
     protected MockMvc mockMvc;
     protected MockHttpSession session;
@@ -58,7 +62,7 @@ public class ItBase {
         this.session = new MockHttpSession();
         this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 
-        authorization = UUID.randomUUID().toString();
+        authorization = String.format("Autho_%s", UUID.randomUUID().toString());
 
         username = "username";
         password = "password";
@@ -68,50 +72,53 @@ public class ItBase {
     }
 
     public void cleanup() {
-        participantVORepository.deleteAll();
+        bookingRepository.deleteAll();
         seminarVORepository.deleteAll();
+        participantVORepository.deleteAll();
     }
+    
+    
+    
+    // about Booking:
+    public Booking buildBooking(SeminarVO currentSeminar) {
+        return new Booking(currentSeminar);    
+    }    
+    
 
-    // SeminarVO
+    // about SeminarVO:
 
-    public SeminarVO buildSeminarVO(String name, int max, StateOfSeminarVO state) {
+    public SeminarVO buildSeminarVO(String name, int max) {
         SeminarVO item = new SeminarVO();
 
         item.setName(name);
         item.setMax(max);
-        item.setState(state);
+        item.setState(StateOfSeminarVO.AVAILABLE);
+        
+        for (int i=0; i < max - 1; i++) {
+            item.getParticipants().add(buildParticipantVO());
+        }
 
         return item;
-    }
-
-    public SeminarVO buildSeminarVO(String name, int max) {
-        return buildSeminarVO(name, max, StateOfSeminarVO.AVAILABLE);
     }
 
     public SeminarVO buildSeminarVO(String name) {
-        return buildSeminarVO(name, random.nextInt(), StateOfSeminarVO.AVAILABLE);
+        return buildSeminarVO(name, random.nextInt(4) + 2);
     }
 
     public SeminarVO buildSeminarVO() {
-        return buildSeminarVO(UUID.randomUUID().toString(), random.nextInt(), StateOfSeminarVO.AVAILABLE);
+        return buildSeminarVO(
+                String.format("Name_%s", UUID.randomUUID().toString()), 
+                random.nextInt(4) + 2);
     }
 
-    // Participants
-
-    public ParticipantVO buildParticipantVO(String name, SeminarVO seminar) {
-        ParticipantVO item = new ParticipantVO();
-
-        item.setName(name);
-        item.setCurrentSeminar(seminar);
-
-        return item;
-    }
+    // about Participants:
 
     public ParticipantVO buildParticipantVO(String name) {
-        return buildParticipantVO(name, null);
+        return new ParticipantVO(name);
     }
 
     public ParticipantVO buildParticipantVO() {
-        return buildParticipantVO(UUID.randomUUID().toString(), null);
+        return buildParticipantVO(
+                String.format("Vorname_%s, Nachname_%s", UUID.randomUUID(), UUID.randomUUID()));
     }
 }
